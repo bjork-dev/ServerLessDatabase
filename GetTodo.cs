@@ -19,23 +19,18 @@ namespace assignment
         private static DocumentClient client;
 
         [FunctionName("GetTodo")]
-        public static async Task<IActionResult> Run(
+        public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "todo")] HttpRequest req,
-           [CosmosDB(
+            [CosmosDB(
                 databaseName: "TodoDb",
                 collectionName: "TodoItems",
-                ConnectionStringSetting = "CosmosDbConnectionString",
-                SqlQuery = "SELECT * FROM c order by c._ts desc")]
-                IEnumerable<Todo> toDoItems,
+                ConnectionStringSetting = "CosmosDbConnectionString")]
+                IEnumerable<Todo> todoItems,
                 ILogger log)
         {
-        
-            log.LogInformation("C# HTTP trigger function processed a request.");
-            foreach (Todo toDoItem in toDoItems)
-            {
-                log.LogInformation(toDoItem.Description);
-            }
-            return new OkObjectResult(toDoItems);
+            if(todoItems == null)
+                return new NotFoundObjectResult("No entries found.");
+            return new OkObjectResult(todoItems);
         }
     }
 }

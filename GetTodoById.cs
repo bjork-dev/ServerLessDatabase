@@ -14,7 +14,7 @@ namespace ServerLessDatabase
     public static class GetTodoById
     {
         [FunctionName("GetTodoById")]
-        public static async Task<IActionResult> Run(
+        public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "todo/{id}")] HttpRequest req,
             [CosmosDB(
                 databaseName: "TodoDb",
@@ -24,14 +24,10 @@ namespace ServerLessDatabase
                 Id = "{id}")] Todo toDoItem, // Used for binding to the class
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
             if (toDoItem == null)
             {
-                log.LogInformation($"ToDo item not found");
-            }
-            else
-            {
-                log.LogInformation($"Found ToDo item, Description={toDoItem.Description}");
+                log.LogError($"Todo item not found");
+                return new NotFoundObjectResult("Todo item not found");
             }
             return new OkObjectResult(toDoItem);
         }

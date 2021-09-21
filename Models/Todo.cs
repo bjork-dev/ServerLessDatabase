@@ -5,6 +5,7 @@ namespace assignment.Models
 {
     public class Todo
     {
+        private string title;
         [JsonProperty("id")]
         public string Id { get; set; }
         [JsonProperty("title")]
