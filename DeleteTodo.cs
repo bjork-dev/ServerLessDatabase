@@ -38,9 +38,9 @@ namespace ServerLessDatabase
                 await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
                 return new OkObjectResult("Deleted " + todo.Title);
             }
-            catch
+            catch(Exception e)
             {
-                return new NotFoundObjectResult("Item does not exist.");
+                return new NotFoundObjectResult(e.Message);
             }
         }
     }
