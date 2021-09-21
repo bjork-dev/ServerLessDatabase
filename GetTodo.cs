@@ -20,7 +20,7 @@ namespace assignment
 
         [FunctionName("GetTodo")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "todo")] HttpRequest req,
            [CosmosDB(
                 databaseName: "TodoDb",
                 collectionName: "TodoItems",
