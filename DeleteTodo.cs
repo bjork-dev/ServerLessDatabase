@@ -11,12 +11,16 @@ using Newtonsoft.Json;
 using assignment.Models;
 using System.Collections.Generic;
 using Microsoft.Azure.Documents.Client;
+using System.Configuration;
 
 namespace ServerLessDatabase
 {
     public static class DeleteTodo
     {
-        public static readonly List<Todo> todos = new List<Todo>();
+        private static DocumentClient client;
+        private static readonly string ENDPOINT = Environment.GetEnvironmentVariable("AccountEndpoint", EnvironmentVariableTarget.Process);
+        private static readonly string KEY = Environment.GetEnvironmentVariable("AccountKey", EnvironmentVariableTarget.Process);
+
         [FunctionName("DeleteTodo")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "todo/{id}")] HttpRequest req,
@@ -25,9 +29,12 @@ namespace ServerLessDatabase
                 collectionName: "TodoItems",
                 PartitionKey = "{id}",
                 Id = "{id}",
-                ConnectionStringSetting = "CosmosDbConnectionString")] Todo todoItem,
+                ConnectionStringSetting = "CosmosDbConnectionString")] Todo todo,
             ILogger log)
         {
+            client = new DocumentClient(new Uri(ENDPOINT), KEY);
+            await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
+            log.LogWarning(todo.Id);
             return new OkObjectResult("Deleted");
         }
     }
