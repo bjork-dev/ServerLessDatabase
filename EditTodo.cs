@@ -9,38 +9,43 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using assignment.Models;
-using System.Collections.Generic;
 using Microsoft.Azure.Documents.Client;
-using System.Configuration;
 
 namespace ServerLessDatabase
 {
-    public static class DeleteTodo
+    public static class EditTodo
     {
         private static DocumentClient client;
         private static readonly string _endpoint = Environment.GetEnvironmentVariable("AccountEndpoint", EnvironmentVariableTarget.Process);
         private static readonly string _key = Environment.GetEnvironmentVariable("AccountKey", EnvironmentVariableTarget.Process);
 
-        [FunctionName("DeleteTodo")]
+        [FunctionName("EditTodo")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "todo/{id}")] HttpRequest req,
-            [CosmosDB(
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "todo/{id}")] HttpRequest req,
+             [CosmosDB(
                 databaseName: "TodoDb",
                 collectionName: "TodoItems",
                 PartitionKey = "{id}",
                 Id = "{id}",
-                ConnectionStringSetting = "CosmosDbConnectionString")] Todo todo,
-            ILogger log)
+                ConnectionStringSetting = "CosmosDbConnectionString")]
+                Todo todo,
+                ILogger log)
         {
             try
             {
+                string id = todo.Id;
+                var obj = new StreamReader(req.Body).ReadToEnd();
+                todo = JsonConvert.DeserializeObject<Todo>(obj);
+                todo.Id = id; // By assining here, we don't need to include ID in the request body.
                 client = new DocumentClient(new Uri(_endpoint), _key);
-                await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
-                return new OkObjectResult("Deleted " + todo.Title);
-            }
-            catch
+                await client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), todo, new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
+
+                log.LogInformation($"C# HTTP trigger function inserted one row");
+
+                return new OkObjectResult(todo);
+            } catch (Exception e)
             {
-                return new NotFoundObjectResult("Item does not exist.");
+                return new BadRequestObjectResult(e.Message);
             }
         }
     }

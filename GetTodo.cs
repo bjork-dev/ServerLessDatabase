@@ -16,8 +16,6 @@ namespace assignment
 {
     public static class GetTodo
     {
-        private static DocumentClient client;
-
         [FunctionName("GetTodo")]
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "todo")] HttpRequest req,

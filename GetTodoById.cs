@@ -21,15 +21,15 @@ namespace ServerLessDatabase
                 collectionName: "TodoItems",
                 ConnectionStringSetting = "CosmosDbConnectionString",
                 PartitionKey = "{id}", // Used for querying the table
-                Id = "{id}")] Todo toDoItem, // Used for binding to the class
+                Id = "{id}")] Todo todoItem, // Used for binding to the class
             ILogger log)
         {
-            if (toDoItem == null)
+            if (todoItem == null)
             {
                 log.LogError($"Todo item not found");
                 return new NotFoundObjectResult("Todo item not found");
             }
-            return new OkObjectResult(toDoItem);
+            return new OkObjectResult(todoItem);
         }
     }
 }
