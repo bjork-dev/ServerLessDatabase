@@ -32,10 +32,16 @@ namespace ServerLessDatabase
                 ConnectionStringSetting = "CosmosDbConnectionString")] Todo todo,
             ILogger log)
         {
-            client = new DocumentClient(new Uri(ENDPOINT), KEY);
-            await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
-            log.LogWarning(todo.Id);
-            return new OkObjectResult("Deleted");
+            try
+            {
+                client = new DocumentClient(new Uri(ENDPOINT), KEY);
+                await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("TodoDb", "TodoItems", todo.Id), new RequestOptions { PartitionKey = new Microsoft.Azure.Documents.PartitionKey(todo.Id) });
+                return new OkObjectResult("Deleted " + todo.Title);
+            }
+            catch
+            {
+                return new NotFoundObjectResult("Item does not exist.");
+            }
         }
     }
 }
