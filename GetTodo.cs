@@ -14,11 +14,11 @@ using System.Collections.Generic;
 
 namespace assignment
 {
-    public static class get_todo
+    public static class GetTodo
     {
         private static DocumentClient client;
 
-        [FunctionName("get-todo")]
+        [FunctionName("GetTodo")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
            [CosmosDB(
@@ -29,6 +29,7 @@ namespace assignment
                 IEnumerable<Todo> toDoItems,
                 ILogger log)
         {
+        
             log.LogInformation("C# HTTP trigger function processed a request.");
             foreach (Todo toDoItem in toDoItems)
             {

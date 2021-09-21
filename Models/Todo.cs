@@ -12,6 +12,6 @@ namespace assignment.Models
         [JsonProperty("description")]
         public string Description { get; set; }
         [JsonProperty("dueBy")]
-        public DateTime DueBy {get; set;}
+        public string DueBy {get; set;}
     }
 }
