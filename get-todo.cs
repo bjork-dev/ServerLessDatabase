@@ -25,7 +25,7 @@ namespace assignment
                 databaseName: "TodoDb",
                 collectionName: "TodoItems",
                 ConnectionStringSetting = "CosmosDbConnectionString",
-                SqlQuery = "SELECT top 2 * FROM c order by c._ts desc")]
+                SqlQuery = "SELECT * FROM c order by c._ts desc")]
                 IEnumerable<Todo> toDoItems,
                 ILogger log)
         {
